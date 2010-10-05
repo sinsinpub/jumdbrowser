@@ -39,8 +39,7 @@
 				<attribute name="Main-Class" value="${jpcsp.mainclass}" />
 				<attribute name="Class-Path" value="${jar.classpath}" />
 			</manifest>
-			<fileset dir="bin">
-			</fileset>
+			<fileset dir="bin" />
 		</jar>
 	</target>
 	<target depends="package" name="deploy">
