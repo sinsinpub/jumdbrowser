@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="build" name="UmdBrowser">
+<project basedir="." default="run" name="UmdBrowser">
 	<property environment="env" />
 	<property name="debuglevel" value="source,lines,vars" />
 	<property name="target" value="1.6" />
@@ -8,8 +8,7 @@
 	<property name="jpcsp.jarname" value="umdbrowser.jar" />
 	<property name="jpcsp.mainclass" value="jpcsp.UmdBrowserMain" />
 	<property name="jpcsp.version" value="0.6" />
-
-	<property name="deploy.target" value="D:/temp/UmdBrowser" />
+	<property name="deploy.target" value="dist" />
 
 	<path id="UmdBrowser.classpath">
 		<pathelement location="bin" />
@@ -57,8 +56,10 @@
 			<fileset file="UmdBrowser.bat" />
 		</copy>
 	</target>
-	<target name="UmdBrowserMain">
+	<target name="run">
 		<java classname="${jpcsp.mainclass}" failonerror="true" fork="yes">
+			<env key="PATH" value="lib;lib/windows-x86;${env.Path}" />
+			<jvmarg line="-Djava.library.path=lib/windows-x86" />
 			<classpath refid="UmdBrowser.classpath" />
 		</java>
 	</target>
