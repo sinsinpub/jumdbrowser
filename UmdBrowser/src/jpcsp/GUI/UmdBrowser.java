@@ -44,6 +44,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -51,6 +52,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.AbstractBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -261,6 +263,9 @@ public class UmdBrowser extends JFrame {
 	private JLabel icon0Label;
 	private JTable table;
 	private JPopupMenu contextMenu;
+	private JMenuItem paramInfo;
+	private JMenuItem isoExplorer;
+	private JMenuItem stopVideo;
 	private File[] programs;
 	private ImageIcon[] icons;
 	private PSF[] psfs;
@@ -291,7 +296,7 @@ public class UmdBrowser extends JFrame {
 		browseButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				browseButtonActionPerformed(e);
+				browseUmdPathAction();
 			}
 		});
 
@@ -303,10 +308,39 @@ public class UmdBrowser extends JFrame {
 			}
 		});
 
-		contextMenu = new JPopupMenu();
-		contextMenu.add(new JMenuItem("View Param Info"));
-		contextMenu.add(new JMenuItem("Open ISO Explorer"));
-		contextMenu.setInvoker(table);
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+
+		paramInfo = new JMenuItem();
+		paramInfo.setText(Resource.get("paramInfoMenu"));
+		paramInfo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openParamInfoAction();
+			}
+		});
+		isoExplorer = new JMenuItem();
+		isoExplorer.setText(Resource.get("isoExplorerMenu"));
+		isoExplorer.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openIsoExplorerAction();
+			}
+		});
+		stopVideo = new JMenuItem();
+		stopVideo.setText(Resource.get("stopVideoMenu"));
+		stopVideo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				stopVideo();
+			}
+		});
+
+		contextMenu = new JPopupMenu("Popup Menu");
+		contextMenu.add(paramInfo);
+		contextMenu.add(isoExplorer);
+		contextMenu.addSeparator();
+		contextMenu.add(stopVideo);
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
@@ -383,11 +417,21 @@ public class UmdBrowser extends JFrame {
 
 		table.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg) {
-				if (arg.isPopupTrigger())
-					contextMenu
-							.show(arg.getComponent(), arg.getX(), arg.getY());
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					contextMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+				super.mousePressed(e);
 			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					contextMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+				super.mouseReleased(e);
+			}
+
 		});
 
 		table.addKeyListener(new KeyListener() {
@@ -555,7 +599,7 @@ public class UmdBrowser extends JFrame {
 		return title;
 	}
 
-	private void browseButtonActionPerformed(ActionEvent evt) {
+	private void browseUmdPathAction() {
 		FolderChooser folderChooser = new FolderChooser("select folder");
 		int result = folderChooser.showSaveDialog(browseButton
 				.getTopLevelAncestor());
@@ -563,6 +607,16 @@ public class UmdBrowser extends JFrame {
 			umdPathText.setText(folderChooser.getSelectedFile().getPath());
 			reloadIsoFilesTable();
 		}
+	}
+
+	private void openParamInfoAction() {
+		// TODO Not implemented
+		JOptionPane.showMessageDialog(this, "Not implemented :)");
+	}
+
+	private void openIsoExplorerAction() {
+		// TODO Not implemented
+		JOptionPane.showMessageDialog(this, "Not implemented :)");
 	}
 
 	private void scrollTo(char c) {
@@ -681,22 +735,22 @@ public class UmdBrowser extends JFrame {
 				setColor(g, 0f, alpha);
 				// Shadow line on the right side
 				g.drawLine(x + width - borderWidth + i, y + topSpace
-						+ shadowWidth, x + width - borderWidth + i, y + height
-						- borderWidth);
+						+ shadowWidth / 2 + shadowWidth, x + width
+						- borderWidth + i, y + height - borderWidth);
 
 				// Shadow line at the bottom
-				g.drawLine(x + leftSpace + shadowWidth, y + height
-						- borderWidth + i, x + width - borderWidth, y + height
-						- borderWidth + i);
+				g.drawLine(x + leftSpace + shadowWidth + shadowWidth / 2, y
+						+ height - borderWidth + i, x + width - borderWidth, y
+						+ height - borderWidth + i);
 			}
 
 			// Shadow at top right corner
-			drawCorner(g, noBeat, 0f, x + width - borderWidth - 1,
-					y + topSpace, 0, shadowWidth, shadowWidth);
+			drawCorner(g, noBeat, 0f, x + width - borderWidth - 1, y + topSpace
+					+ shadowWidth / 2 - 1, 0, shadowWidth, shadowWidth + 1);
 
 			// Shadow at bottom left corner
-			drawCorner(g, noBeat, 0f, x + leftSpace, y + height - borderWidth
-					- 1, shadowWidth, 0, shadowWidth);
+			drawCorner(g, noBeat, 0f, x + leftSpace + shadowWidth / 2 - 1, y
+					+ height - borderWidth - 1, shadowWidth, 0, shadowWidth + 1);
 
 			// Shadow at bottom right corner
 			drawCorner(g, noBeat, 0f, x + width - borderWidth, y + height

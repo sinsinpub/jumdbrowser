@@ -24,7 +24,8 @@ public class UmdBrowserMain {
 		// Load log4j settings
 		try {
 			Properties log4j = new Properties();
-			log4j.load(UmdBrowserMain.class.getResourceAsStream("/jpcsp/log4j.properties"));
+			log4j.load(UmdBrowserMain.class
+					.getResourceAsStream("/jpcsp/log4j.properties"));
 			PropertyConfigurator.configure(log4j);
 		} catch (IOException e) {
 		}
@@ -41,12 +42,13 @@ public class UmdBrowserMain {
 			public void run() {
 				Thread.currentThread()
 						.setName(UmdBrowser.windowNameForSettings);
-				umdBrowser = new UmdBrowser(new File(Settings.getInstance()
-						.readString("emu.umdpath")
-						+ "/"));
+				String umdPath = Settings.getInstance().readString(
+						"emu.umdpath");
+				if (!umdPath.endsWith(File.separator))
+					umdPath = umdPath.concat(File.separator);
+				umdBrowser = new UmdBrowser(new File(umdPath));
 				umdBrowser.setVisible(true);
 			}
 		});
 	}
-
 }
