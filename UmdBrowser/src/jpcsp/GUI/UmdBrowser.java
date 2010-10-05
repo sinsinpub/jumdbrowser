@@ -19,6 +19,7 @@ package jpcsp.GUI;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -310,9 +311,11 @@ public class UmdBrowser extends JFrame {
 
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+		Font menuFont = new Font(Font.DIALOG, Font.PLAIN, 12);
 
 		paramInfo = new JMenuItem();
 		paramInfo.setText(Resource.get("paramInfoMenu"));
+		paramInfo.setFont(menuFont);
 		paramInfo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -321,6 +324,7 @@ public class UmdBrowser extends JFrame {
 		});
 		isoExplorer = new JMenuItem();
 		isoExplorer.setText(Resource.get("isoExplorerMenu"));
+		isoExplorer.setFont(menuFont);
 		isoExplorer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -329,6 +333,7 @@ public class UmdBrowser extends JFrame {
 		});
 		stopVideo = new JMenuItem();
 		stopVideo.setText(Resource.get("stopVideoMenu"));
+		stopVideo.setFont(menuFont);
 		stopVideo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
