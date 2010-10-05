@@ -8,12 +8,17 @@
 	<property name="jpcsp.jarname" value="umdbrowser.jar" />
 	<property name="jpcsp.mainclass" value="jpcsp.UmdBrowserMain" />
 	<property name="jpcsp.version" value="0.6" />
-	<property name="deploy.target" value="dist" />
+	<property name="jpcsp.distribute" value="dist" />
 
+	<path id="UmdBrowser.runtime.classpath">
+		<pathelement location="bin" />
+		<fileset dir="lib" includes="**/*.jar" excludes="sw*.jar" />
+	</path>
 	<path id="UmdBrowser.classpath">
 		<pathelement location="bin" />
 		<fileset dir="lib" includes="**/*.jar" />
 	</path>
+
 	<target name="init">
 		<mkdir dir="bin" />
 		<copy includeemptydirs="false" todir="bin">
@@ -29,9 +34,10 @@
 			<classpath refid="UmdBrowser.classpath" />
 		</javac>
 	</target>
+
 	<target depends="clean,build" name="package">
 		<manifestclasspath property="jar.classpath" jarfile="bin/${jpcsp.jarname}">
-			<classpath refid="UmdBrowser.classpath" />
+			<classpath refid="UmdBrowser.runtime.classpath" />
 		</manifestclasspath>
 		<jar destfile="bin/${jpcsp.jarname}">
 			<manifest>
@@ -41,24 +47,35 @@
 			<fileset dir="bin" />
 		</jar>
 	</target>
+
 	<target depends="package" name="deploy">
-		<mkdir dir="${deploy.target}" />
-		<copy todir="${deploy.target}/bin">
+		<mkdir dir="${jpcsp.distribute}" />
+		<copy todir="${jpcsp.distribute}/bin">
 			<fileset dir="bin" includes="*.jar" />
 		</copy>
-		<copy todir="${deploy.target}/lib">
-			<fileset dir="lib" includes="**/*" />
+		<copy todir="${jpcsp.distribute}/lib">
+			<fileset dir="lib" includes="**/*" excludes="sw*.jar" />
 		</copy>
-		<copy todir="${deploy.target}/umdimages">
+		<copy todir="${jpcsp.distribute}/umdimages">
 			<fileset dir="umdimages" includes="*" />
 		</copy>
-		<copy todir="${deploy.target}">
+		<copy todir="${jpcsp.distribute}">
 			<fileset file="UmdBrowser.bat" />
 		</copy>
 	</target>
+
 	<target name="run">
 		<java classname="${jpcsp.mainclass}" failonerror="true" fork="yes">
 			<env key="PATH" value="lib;lib/windows-x86;${env.Path}" />
+			<jvmarg line="-Djava.library.path=lib/windows-x86" />
+			<classpath refid="UmdBrowser.runtime.classpath" />
+		</java>
+	</target>
+	<target name="swingExplorer">
+		<java classname="org.swingexplorer.Launcher" failonerror="true" fork="yes">
+			<arg value="${jpcsp.mainclass}" />
+			<env key="PATH" value="lib;lib/windows-x86;${env.Path}" />
+			<jvmarg line="-javaagent:lib/swag.jar -Xbootclasspath/a:lib/swag.jar" />
 			<jvmarg line="-Djava.library.path=lib/windows-x86" />
 			<classpath refid="UmdBrowser.classpath" />
 		</java>
