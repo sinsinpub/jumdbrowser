@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="UmdBrowser">
+	<property environment="env" />
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.6" />
+	<property name="source" value="1.6" />
+
+	<property name="jpcsp.jarname" value="umdbrowser.jar" />
+	<property name="jpcsp.mainclass" value="jpcsp.UmdBrowserMain" />
+	<property name="jpcsp.version" value="0.6" />
+
+	<property name="deploy.target" value="D:/temp/UmdBrowser" />
+
+	<path id="UmdBrowser.classpath">
+		<pathelement location="bin" />
+		<fileset dir="lib" includes="**/*.jar" />
+	</path>
+	<target name="init">
+		<mkdir dir="bin" />
+		<copy includeemptydirs="false" todir="bin">
+			<fileset dir="src" excludes="**/*.launch, **/*.java, **/*.form" />
+		</copy>
+	</target>
+	<target name="clean">
+		<delete dir="bin" />
+	</target>
+	<target depends="init" name="build">
+		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+			<src path="src" />
+			<classpath refid="UmdBrowser.classpath" />
+		</javac>
+	</target>
+	<target depends="clean,build" name="package">
+		<manifestclasspath property="jar.classpath" jarfile="bin/${jpcsp.jarname}">
+			<classpath refid="UmdBrowser.classpath" />
+		</manifestclasspath>
+		<jar destfile="bin/${jpcsp.jarname}">
+			<manifest>
+				<attribute name="Main-Class" value="${jpcsp.mainclass}" />
+				<attribute name="Class-Path" value="${jar.classpath}" />
+			</manifest>
+			<fileset dir="bin">
+			</fileset>
+		</jar>
+	</target>
+	<target depends="package" name="deploy">
+		<mkdir dir="${deploy.target}" />
+		<copy todir="${deploy.target}/bin">
+			<fileset dir="bin" includes="*.jar" />
+		</copy>
+		<copy todir="${deploy.target}/lib">
+			<fileset dir="lib" includes="**/*" />
+		</copy>
+		<copy todir="${deploy.target}/umdimages">
+			<fileset dir="umdimages" includes="*" />
+		</copy>
+		<copy todir="${deploy.target}">
+			<fileset file="UmdBrowser.bat" />
+		</copy>
+	</target>
+	<target name="UmdBrowserMain">
+		<java classname="${jpcsp.mainclass}" failonerror="true" fork="yes">
+			<classpath refid="UmdBrowser.classpath" />
+		</java>
+	</target>
+</project>
