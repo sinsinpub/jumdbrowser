@@ -42,8 +42,10 @@ import javax.swing.GroupLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -267,6 +269,15 @@ public class UmdBrowser extends JFrame {
 	private JMenuItem paramInfo;
 	private JMenuItem isoExplorer;
 	private JMenuItem stopVideo;
+	private JMenu optionsMenu;
+	private JMenu languageMenu;
+	private JMenuItem englishMenu;
+	private JMenuItem japaneseMenu;
+	private JMenuItem schineseMenu;
+	private JMenuItem aboutMenu;
+	private ParamSfoViewer paramSfoViewer;
+	private UmdIsoExplorer umdIsoExplorer;
+	private File umdPath;
 	private File[] programs;
 	private ImageIcon[] icons;
 	private PSF[] psfs;
@@ -278,9 +289,14 @@ public class UmdBrowser extends JFrame {
 	private JTextField umdPathText;
 
 	public UmdBrowser(File path) {
+		setUmdPath(path);
+		initComponents();
+	}
+
+	private void initComponents() {
 		setTitle(Resource.get("umdIsoCsobrowser"));
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		initIsoFilesTable(path);
+		initIsoFilesTable();
 
 		JScrollPane scrollPane = new JScrollPane(table);
 
@@ -289,7 +305,7 @@ public class UmdBrowser extends JFrame {
 		layout.setAutoCreateContainerGaps(true);
 
 		umdPathLabel = new JLabel(Resource.get("UMDpath"));
-		umdPathText = new JTextField(path.getAbsolutePath());
+		umdPathText = new JTextField(umdPath.getAbsolutePath());
 
 		JButton cancelButton = new CancelButton(this);
 
@@ -341,11 +357,57 @@ public class UmdBrowser extends JFrame {
 			}
 		});
 
+		englishMenu = new JMenuItem();
+		englishMenu.setText(Resource.get("english"));
+		englishMenu.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeLanguage("en_EN");
+			}
+		});
+
+		japaneseMenu = new JMenuItem();
+		japaneseMenu.setText(Resource.get("japanese"));
+		japaneseMenu.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeLanguage("jp_JP");
+			}
+		});
+
+		schineseMenu = new JMenuItem();
+		schineseMenu.setText(Resource.get("schinese"));
+		schineseMenu.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeLanguage("zh_CN");
+			}
+		});
+
+		languageMenu = new JMenu();
+		languageMenu.setText(Resource.get("language"));
+		languageMenu.setFont(menuFont);
+		languageMenu.add(englishMenu);
+		languageMenu.add(japaneseMenu);
+		languageMenu.add(schineseMenu);
+
+		optionsMenu = new JMenu();
+		optionsMenu.setText(Resource.get("options"));
+		optionsMenu.setFont(menuFont);
+		optionsMenu.add(languageMenu);
+
+		aboutMenu = new JMenuItem();
+		aboutMenu.setText(Resource.get("about"));
+		aboutMenu.setFont(menuFont);
+
 		contextMenu = new JPopupMenu("Popup Menu");
 		contextMenu.add(paramInfo);
 		contextMenu.add(isoExplorer);
-		contextMenu.addSeparator();
 		contextMenu.add(stopVideo);
+		contextMenu.addSeparator();
+		contextMenu.add(optionsMenu);
+		contextMenu.addSeparator();
+		contextMenu.add(aboutMenu);
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
@@ -402,8 +464,8 @@ public class UmdBrowser extends JFrame {
 				1000, 350));
 	}
 
-	private void initIsoFilesTable(File path) {
-		table = new JTable(new MemStickTableModel(path),
+	private void initIsoFilesTable() {
+		table = new JTable(new MemStickTableModel(umdPath),
 				new MemStickTableColumnModel());
 		table.setFillsViewportHeight(true);
 		table.setRowHeight(80);
@@ -482,6 +544,12 @@ public class UmdBrowser extends JFrame {
 			width += 2 * colModel.getColumnMargin();
 			col.setPreferredWidth(width);
 		}
+	}
+
+	private void changeLanguage(String language) {
+		// Resource.add("jpcsp.languages." + language);
+		Settings.getInstance().writeString("emu.language", language);
+		JOptionPane.showMessageDialog(this, Resource.get("effectNextTime"));
 	}
 
 	private void loadUmdInfo(int rowIndex) {
@@ -606,6 +674,7 @@ public class UmdBrowser extends JFrame {
 
 	private void browseUmdPathAction() {
 		FolderChooser folderChooser = new FolderChooser("select folder");
+		folderChooser.setDialogTitle(Resource.get("UMDpath"));
 		int result = folderChooser.showSaveDialog(browseButton
 				.getTopLevelAncestor());
 		if (result == FolderChooser.APPROVE_OPTION) {
@@ -615,13 +684,20 @@ public class UmdBrowser extends JFrame {
 	}
 
 	private void openParamInfoAction() {
-		// TODO Not implemented
-		JOptionPane.showMessageDialog(this, "Not implemented :)");
+		if (paramSfoViewer == null || !paramSfoViewer.isDisplayable()) {
+			paramSfoViewer = new ParamSfoViewer(this, "UMD parameters");
+			paramSfoViewer.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			System.out.println(paramSfoViewer.getOwner());
+		}
+		paramSfoViewer.setVisible(true);
 	}
 
 	private void openIsoExplorerAction() {
-		// TODO Not implemented
-		JOptionPane.showMessageDialog(this, "Not implemented :)");
+		if (umdIsoExplorer == null || !umdIsoExplorer.isDisplayable()) {
+			umdIsoExplorer = new UmdIsoExplorer();
+			umdIsoExplorer.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		}
+		umdIsoExplorer.setVisible(true);
 	}
 
 	private void scrollTo(char c) {
@@ -663,13 +739,29 @@ public class UmdBrowser extends JFrame {
 			text = text.concat(File.separator);
 		stopVideo();
 		File path = new File(text);
+		setUmdPath(path);
 		table.setModel(new MemStickTableModel(path));
+	}
+
+	public File getUmdPath() {
+		return umdPath;
+	}
+
+	public void setUmdPath(File umdPath) {
+		this.umdPath = umdPath;
 	}
 
 	@Override
 	public void dispose() {
 		// Stop the PMF video and sound before closing the UMD Browser
 		stopVideo();
+
+		if (paramSfoViewer != null) {
+			paramSfoViewer.dispose();
+		}
+		if (umdIsoExplorer != null) {
+			umdIsoExplorer.dispose();
+		}
 
 		Settings.getInstance().writeWindowPos(windowNameForSettings,
 				getLocation());
