@@ -10,6 +10,6 @@
  * 如果提示找不到请到“我的电脑”->“（高级）属性”->“高级”选项卡->“环境变量”中，添加JAVA_HOME指向你的JDK安装目录，或者添加JRE_HOME指向你的JRE安装目录。再尝试脚本。
 
 = 使用 =
- * 因为只准备了32位Windows用的相关文件，所以如果是32位Windows系统并且想要播放PMF动画、声音，请再到lib\windows-x86目录下，把ffmpeg-natives.7z解压到同文件夹。别的系统可以到jpcsp模拟器里找对应的解码文件。
- * 小贴士：不需看到黑屏控制台的话可以把java.exe改写成javaw.exe。
- * 已经知问题：Windows 7和Ubuntu下测试时右键菜单都会莫名的错位和无法弹出；OpenJDK实现运行的话可能图片旁边的阴影边框会出现错乱。
+ * 因为只准备了32位Windows用的相关文件，所以如果是32位Windows系统并且想要播放PMF动画、声音，请再到lib\windows-x86目录下，把ffmpeg-natives.7z解压到同文件夹。别的系统可以到jpcsp模拟器里找对应平台的解码文件。
+ * 小贴士：不想看到黑屏控制台的话可以把bat里的java.exe改写成javaw.exe。
+ * 已知问题：Windows 7和Ubuntu下测试时右键菜单都会莫名的错位和无法弹出；OpenJDK实现运行的话可能图片旁边的阴影边框会出现错乱。
